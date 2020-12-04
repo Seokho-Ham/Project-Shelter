@@ -101,7 +101,7 @@ module.exports = {
   },
   signout: (req, res) => {
     try {
-      if (req.cookies.authorization === "undefined") {
+      if (req.cookies.authorization === undefined) {
         res.status(400).end("You are not logged in");
       } else {
         req.user = undefined;

@@ -1,43 +1,31 @@
-import React, { useState } from "react";
-import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Marker,
+} from "react-google-maps";
 
-import ShelterDetail from "../../containers/map/ShelterMarkerContainer";
+import ShelterMarker from "./ShelterMarker";
 import { googleMap } from "../../config/apiKey";
 
-const getLocations = shelters => {
-  const ret = [];
-
-  shelters.forEach(shelter => {
-    ret.push({
-      lat: Number(shelter.REFINE_WGS84_LAT),
-      lng: Number(shelter.REFINE_WGS84_LOGT),
-    });
+export default function Map() {
+  const [curPos, setCurPos] = useState({
+    lat: 37.288122,
+    lng: 126.979956,
   });
+  const shelters = useSelector(state => state.filter.shelters);
+  const { showCurrentPosition } = useSelector(state => state.map);
 
-  return ret;
-};
-
-const Map = props => {
-  const positions = getLocations(props.shelters);
-  const shelters = props.shelters;
-  const [curPos, setCurPos] = useState({});
-
-  if (Object.keys(curPos).length === 0) {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        setCurPos({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      () => {
-        setCurPos({
-          lat: 37.288122,
-          lng: 126.979956,
-        });
-      }
-    );
-  }
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(position => {
+      setCurPos({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+    });
+  }, []);
 
   const MapWithAMarker = withScriptjs(
     withGoogleMap(props => (
@@ -48,45 +36,37 @@ const Map = props => {
           disableDefaultUI: true,
         }}
       >
-        {props.positions &&
-          props.positions.map((position, idx) => (
-            <ShelterDetail
-              position={position}
-              shelter={shelters[idx]}
-              key={shelters[idx].id}
-            />
-          ))}
+        <Marker className="current-position" position={curPos} />
+        {shelters.map(shelter => (
+          <ShelterMarker
+            position={{
+              lat: Number(shelter.REFINE_WGS84_LAT),
+              lng: Number(shelter.REFINE_WGS84_LOGT),
+            }}
+            shelter={shelter}
+            key={shelter.id}
+          />
+        ))}
       </GoogleMap>
     ))
   );
 
   return (
     <div className="map">
-      {props.shelters.length > 0 && (
-        <MapWithAMarker
-          googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${googleMap}&v=3.exp&libraries=geometry,drawing,places`}
-          loadingElement={<div style={{ height: `100%`, width: `100%` }} />}
-          containerElement={<div style={{ height: `100%`, width: `100%` }} />}
-          mapElement={<div style={{ height: `100%`, width: `100%` }} />}
-          positions={positions}
-          shelter={props.shelter}
-          defaultCenter={{
-            lat: Number(shelters[0].REFINE_WGS84_LAT),
-            lng: Number(shelters[0].REFINE_WGS84_LOGT),
-          }}
-        />
-      )}
-      {props.shelters.length === 0 && (
-        <MapWithAMarker
-          googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${googleMap}&v=3.exp&libraries=geometry,drawing,places`}
-          loadingElement={<div style={{ height: `100%`, width: `100%` }} />}
-          containerElement={<div style={{ height: `100%`, width: `100%` }} />}
-          mapElement={<div style={{ height: `100%`, width: `100%` }} />}
-          defaultCenter={curPos}
-        />
-      )}
+      <MapWithAMarker
+        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${googleMap}&v=3.exp&libraries=geometry,drawing,places`}
+        loadingElement={<div style={{ height: `100%`, width: `100%` }} />}
+        containerElement={<div style={{ height: `100%`, width: `100%` }} />}
+        mapElement={<div style={{ height: `100%`, width: `100%` }} />}
+        defaultCenter={
+          shelters.length === 0 || showCurrentPosition
+            ? curPos
+            : {
+                lat: Number(shelters[0].REFINE_WGS84_LAT),
+                lng: Number(shelters[0].REFINE_WGS84_LOGT),
+              }
+        }
+      />
     </div>
   );
-};
-
-export default Map;
+}

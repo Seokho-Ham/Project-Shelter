@@ -6,10 +6,17 @@
 @import "./filter/FilterCondition.css";
 @import "./filter/FilterKeyword.css";
 @import "./filter/FilterList.css";
-@import "./Signup.css";
-@import "./Signin.css";
-@import "./Signout.css";
-@import "./Login.css";
+@import "./filter/FilterCategory.css";
+@import "./user/Signup.css";
+@import "./user/Signin.css";
+@import "./user/Signout.css";
+@import "./user/SigninForm.css";
+@import "./user/SignupForm.css";
+@import "./user/SignoutForm.css";
+@import "./user/ToggleButton.css";
+@import "./user/TypeSelectionInput.css";
+@import "./user/FormInput.css";
+@import "./Loading.css";
 
 * {
   font-family: "Spoqa Han Sans";
@@ -22,7 +29,7 @@
 }
 
 @media screen and (min-width: 480px) {
-  .fab-container div:not(:last-child) {
+  .fab-container div:first-child {
     display: none;
   }
 }

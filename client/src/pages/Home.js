@@ -1,17 +1,17 @@
 import React, { Component } from "react";
 
 import Filter from "../components/filter/Filter";
-import MapContainer from "../containers/map/MapContainer";
+import Map from "../components/map/Map";
 
-import FabContainer from "../components/fab/Fab";
+import Fab from "../components/Fab";
 
 class Home extends Component {
   render() {
     return (
       <div className="home">
         <Filter />
-        <MapContainer />
-        <FabContainer />
+        <Map />
+        <Fab />
       </div>
     );
   }
